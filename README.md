@@ -4,11 +4,11 @@
 
 Junming Huang, Chi Wang, Letian Li, Guangkai Xu, Donglin Huang, Hao Chen, Qiang Dai, Weiwei Xu
 
-[[Paper](https://arxiv.org/abs/2601.21798)] [[PDF](https://arxiv.org/pdf/2601.21798)] [Project Page: Coming soon] [Code: Coming soon] [Checkpoints: Coming soon]
+[[Paper](https://arxiv.org/abs/2601.21798)]
 
 ## News
 
-- **2026-05-07**: 祝贺我们的论文 **CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models** 中稿 ICML 2026！我们会和大家在首尔见面。
+- **2026-05-07**: Congratulations! Our paper **CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models** has been accepted to ICML 2026. See you in Seoul!
 
 ## Overview
 
@@ -44,28 +44,18 @@ CG-MLLM follows a decoder-only multimodal architecture with three major stages:
 
 ## Results
 
-The paper reports that CG-MLLM achieves the best performance among compared MLLM-based 3D generation methods, including SAR3D and ShapeLLM-Omni.
-
-| Model | p-FID ↓ | p-KID ↓ | CLIP-IQA+ ↑ | MUSIQ ↑ | Uni3D ↑ | CLIP ↑ |
+| Method | p-FID(↓) | p-KID(↓) | clipiqa+(↑) | musiq(↑) | clip(↑) | user-study(↑) |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| SAR3D | 30.07 | 1.00 | 0.42 | 66.01 | 0.3193 | 82.86 |
-| ShapeLLM-Omni | 13.11 | 0.29 | 0.37 | 55.71 | 0.3190 | 84.18 |
-| **CG-MLLM** | **12.55** | **0.27** | **0.45** | **71.65** | **0.3198** | **84.47** |
-
-These results show that CG-MLLM improves both geometric fidelity and semantic alignment while keeping 3D generation inside a scalable MLLM framework.
-
-## Citation
-
-If you find this work useful, please consider citing:
-
-```bibtex
-@article{huang2026cgmllm,
-  title={CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models},
-  author={Huang, Junming and Wang, Chi and Li, Letian and Xu, Guangkai and Huang, Donglin and Chen, Hao and Dai, Qiang and Xu, Weiwei},
-  journal={arXiv preprint arXiv:2601.21798},
-  year={2026}
-}
-```
+| **Diffusion-Base** |  |  |  |  |  |  |
+| michelangelo | 17.96 | 0.56 | 0.45 | 71.42 | 84.08 | 2.6 |
+| craftsman | 14.09 | 0.4 | 0.45 | 71.09 | 84.86 | 3.15 |
+| hunyuan3d-2.1 | 16.8 | 0.53 | 0.47 | 71.2 | 85.11 | 3.15 |
+| trellis | 7.36 | 0.12 | 0.44 | 66.97 | 84.13 | 3.28 |
+| sam3d | 33.92 | 1.13 | 0.47 | 70.21 | 84.67 | 3.45 |
+| **MLLM-Base** |  |  |  |  |  |  |
+| sar3d | 30.07 | 1 | 0.42 | 66.01 | 82.86 | 2.93 |
+| shapellm-omni | 13.11 | 0.29 | 0.37 | 55.71 | 84.18 | 2.3 |
+| **ours** | **12.55** | **0.27** | **0.45** | **71.65** | **84.47** | **3.32** |
 
 ## Acknowledgements
 
