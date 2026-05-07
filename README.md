@@ -1,18 +1,29 @@
-# CG-MLLM
+<h1 align="center">CG-MLLM</h1>
 
-**[ICML 2026] CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models**
+<p align="center">
+  <img
+    src="https://img.shields.io/badge/CG--MLLM-ICML%202026-0A66C2?logo=academia&logoColor=white"
+    alt="CG-MLLM ICML 2026"
+  />
+  <a href="https://arxiv.org/abs/2601.21798">
+    <img
+      src="https://img.shields.io/badge/CG--MLLM-Paper-red?logo=arxiv&logoColor=red"
+      alt="CG-MLLM Paper on arXiv"
+    />
+  </a>
+</p>
 
-Junming Huang, Chi Wang, Letian Li, Guangkai Xu, Donglin Huang, Hao Chen, Qiang Dai, Weiwei Xu
+# Captioning and Generating 3D content via Multi-modal Large Language Models
 
-[[Paper](https://arxiv.org/abs/2601.21798)]
+> Junming Huang, Chi Wang, Letian Li, Guangkai Xu, Donglin Huang, Hao Chen, Qiang Dai, Weiwei Xu
+>
+> We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency.
 
 ## News
 
 - **2026-05-07**: Congratulations! Our paper **CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models** has been accepted to ICML 2026. See you in Seoul!
 
 ## Overview
-
-**CG-MLLM** is a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. It brings language, image, and 3D spatial content into a single framework, enabling the model to understand multimodal inputs and generate detailed 3D objects with strong spatial consistency.
 
 Unlike prior 3D MLLM methods that often generate low-resolution meshes, textualized mesh tokens, or coarse structural proxies, CG-MLLM integrates a pretrained vision-language backbone with a specialized 3D VAE latent space. This design allows the model to perform end-to-end 3D generation within the MLLM paradigm while preserving fine-grained geometry.
 
