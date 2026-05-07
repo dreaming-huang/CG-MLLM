@@ -21,6 +21,10 @@
 >
 > We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency.
 
+<p align="center">
+  <img src="assets/overview.png" alt="CG-MLLM generation and understanding examples" width="850"/>
+</p>
+
 ## News
 
 - **2026-05-07**: 🎉 Our paper **CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models** has been accepted to ICML 2026. See you in Seoul!
@@ -28,6 +32,10 @@
 ## Overview
 
 Unlike prior 3D MLLM methods that often generate low-resolution meshes, textualized mesh tokens, or coarse structural proxies, CG-MLLM integrates a pretrained vision-language backbone with a specialized 3D VAE latent space. This design allows the model to perform end-to-end 3D generation within the MLLM paradigm while preserving fine-grained geometry.
+
+<p align="center">
+  <img src="assets/pipeline.png" alt="CG-MLLM pipeline" width="944"/>
+</p>
 
 ## Results
 
