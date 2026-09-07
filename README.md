@@ -15,6 +15,12 @@
       alt="CG-MLLM Paper on arXiv"
     />
   </a>
+  <a href="https://cv.jream.top/CG-MLLM-page/">
+    <img
+      src="https://img.shields.io/badge/CG--MLLM-Project%20Page-blue"
+      alt="CG-MLLM Project Page"
+    />
+  </a>
   <a href="https://github.com/dreaming-huang/CG-MLLM">
     <img
       src="https://img.shields.io/badge/CG--MLLM-Code-black?logo=github&logoColor=white"
@@ -53,14 +59,6 @@ Unlike prior 3D MLLM methods that often generate low-resolution meshes, textuali
 <p align="center">
   <img src="assets/pipeline.png" alt="CG-MLLM pipeline" width="944"/>
 </p>
-
-## Features
-
-1. Image understanding
-2. Image to 3D object
-3. Text to 3D object
-4. Text to text
-5. 3D object understanding
 
 ## Installation
 
