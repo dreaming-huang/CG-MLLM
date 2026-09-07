@@ -1,0 +1,50 @@
+# CG-MLLM inference
+# Merged from BAGEL/requirements.txt + Hunyuan3D pieces used by hy3dshape.
+# When versions conflict, keep the BAGEL / Qwen3-VL side (transformers 4.49).
+
+# Build
+ninja==1.11.1.1
+setuptools
+wheel
+
+# Core
+torch==2.5.1
+torchvision==0.20.1
+transformers==4.49.0
+accelerate>=0.34.0
+huggingface_hub==0.30.2
+safetensors==0.4.5
+einops==0.8.1
+numpy==1.24.4
+scipy==1.10.1
+sentencepiece==0.1.99
+PyYAML==6.0.2
+omegaconf==2.3.0
+easydict
+peft
+timm
+tqdm==4.66.5
+regex
+termcolor
+Requests==2.32.3
+
+# Vision / 3D (Hunyuan ShapeVAE decode + PointBERT)
+opencv_python==4.7.0.72
+pillow
+matplotlib==3.7.0
+scikit-image==0.24.0
+trimesh==4.4.7
+
+# Linux CUDA compile helper used by torch
+triton ; sys_platform != 'win32'
+
+# Install separately if the GPU supports it:
+# pip install flash_attn==2.5.8 --no-build-isolation
+
+# Not included from Hunyuan (texture / demo / training only):
+# rembg, realesrgan, basicsr, tb_nightly, pymeshlab, pygltflib, xatlas,
+# open3d, cupy-cuda12x, onnxruntime, diffusers, pytorch-lightning,
+# deepspeed, gradio, fastapi, uvicorn, pandas, torchmetrics, torchdiffeq
+#
+# Not included from BAGEL (train / eval only):
+# decord, pyarrow, wandb, bitsandbytes, xlsxwriter, gradio
