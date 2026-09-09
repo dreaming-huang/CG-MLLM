@@ -126,21 +126,6 @@ python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk
 
 Generated meshes are written to `--output_dir` (default: `<checkpoint>/output_images`).
 
-## Results
-
-| Method | p-FID(↓) | p-KID(↓) | clipiqa+(↑) | musiq(↑) | clip(↑) | user-study(↑) |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| **Diffusion-Base** |  |  |  |  |  |  |
-| michelangelo | 17.96 | 0.56 | 0.45 | 71.42 | 84.08 | 2.6 |
-| craftsman | 14.09 | 0.4 | 0.45 | 71.09 | 84.86 | 3.15 |
-| hunyuan3d-2.1 | 16.8 | 0.53 | 0.47 | 71.2 | 85.11 | 3.15 |
-| trellis | 7.36 | 0.12 | 0.44 | 66.97 | 84.13 | 3.28 |
-| sam3d | 33.92 | 1.13 | 0.47 | 70.21 | 84.67 | 3.45 |
-| **MLLM-Base** |  |  |  |  |  |  |
-| sar3d | 30.07 | 1 | 0.42 | 66.01 | 82.86 | 2.93 |
-| shapellm-omni | 13.11 | 0.29 | 0.37 | 55.71 | 84.18 | 2.3 |
-| **ours** | **12.55** | **0.27** | **0.45** | **71.65** | **84.47** | **3.32** |
-
 ## Acknowledgements
 
 This inference code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE. Please follow their licenses when using those components.
