@@ -324,7 +324,7 @@ def setup_model(args):
         model.language_model.config.vocab_size = len(tokenizer)
 
     vae_transform = ImageTransform(1024, 512, 16)
-    vit_transform = ImageTransform(980, 224, getattr(vit_config, "patch_size", 14), 2 if args.use_qwen_vit else 1)
+    vit_transform = ImageTransform(518, 224, getattr(vit_config, "patch_size", 14), 2 if args.use_qwen_vit else 1)
 
     if args.mot:
         no_split_classes = ["CGMLLM", "Qwen2MoTDecoderLayer" if not args.use_qwen_vl else "Qwen2VLMoTDecoderLayer"]
