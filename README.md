@@ -126,6 +126,19 @@ python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk
 
 Generated meshes are written to `--output_dir` (default: `<checkpoint>/output_images`).
 
+## Citation
+
+If you find this work useful, please cite:
+
+```bibtex
+@article{huang2026cg,
+  title={CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models},
+  author={Huang, Junming and Wang, Chi and Li, Letian and Xu, Guangkai and Huang, Donglin and Chen, Hao and Dai, Qiang and Xu, Weiwei},
+  journal={arXiv preprint arXiv:2601.21798},
+  year={2026}
+}
+```
+
 ## Acknowledgements
 
 This inference code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE. Please follow their licenses when using those components.
