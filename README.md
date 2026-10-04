@@ -1,39 +1,6 @@
-<h1 align="center">CG-MLLM</h1>
+# CG-MLLM
 
-<p align="center">
-  <img
-    src="https://img.shields.io/badge/version-v0.1-informational"
-    alt="CG-MLLM v0.1"
-  />
-  <img
-    src="https://img.shields.io/badge/CG--MLLM-ICML%202026-0A66C2?logo=academia&logoColor=white"
-    alt="CG-MLLM ICML 2026"
-  />
-  <a href="https://arxiv.org/abs/2601.21798">
-    <img
-      src="https://img.shields.io/badge/CG--MLLM-Paper-red?logo=arxiv&logoColor=red"
-      alt="CG-MLLM Paper on arXiv"
-    />
-  </a>
-  <a href="https://cv.jream.top/CG-MLLM-page/">
-    <img
-      src="https://img.shields.io/badge/CG--MLLM-Project%20Page-blue"
-      alt="CG-MLLM Project Page"
-    />
-  </a>
-  <a href="https://github.com/dreaming-huang/CG-MLLM">
-    <img
-      src="https://img.shields.io/badge/CG--MLLM-Code-black?logo=github&logoColor=white"
-      alt="CG-MLLM Code on GitHub"
-    />
-  </a>
-  <a href="https://huggingface.co/JreamH/CGMLLM">
-    <img
-      src="https://img.shields.io/badge/CG--MLLM-Checkpoint-yellow?logo=huggingface&logoColor=white"
-      alt="CG-MLLM Checkpoint on Hugging Face"
-    />
-  </a>
-</p>
+
 
 # Captioning and Generating 3D content via Multi-modal Large Language Models
 
@@ -41,24 +8,23 @@
 >
 > We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency.
 
-<p align="center">
-  <img src="assets/overview.png" alt="CG-MLLM generation and understanding examples" width="850"/>
-</p>
+
 
 This repository contains the **inference** code.
 
 ## News
 
+- **2026-10-04**: **4B image-to-3D** checkpoint is released. It is a specialized training of our architecture for the image-to-3D object task on HY3D-Bench. Weights: [JreamH/CGMLLM-4B-i2o](https://huggingface.co/JreamH/CGMLLM-4B-i2o).
 - **2026-09-07**: Inference code and **v0.1** checkpoint are released. Weights: [JreamH/CGMLLM](https://huggingface.co/JreamH/CGMLLM).
 - **2026-05-07**: 🎉 Our paper **CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models** has been accepted to ICML 2026. See you in Seoul!
+
+
 
 ## Overview
 
 Unlike prior 3D MLLM methods that often generate low-resolution meshes, textualized mesh tokens, or coarse structural proxies, CG-MLLM integrates a pretrained vision-language backbone with a specialized 3D VAE latent space. This design allows the model to perform end-to-end 3D generation within the MLLM paradigm while preserving fine-grained geometry.
 
-<p align="center">
-  <img src="assets/pipeline.png" alt="CG-MLLM pipeline" width="944"/>
-</p>
+
 
 ## Installation
 
@@ -79,35 +45,60 @@ hf download ByteDance-Seed/BAGEL-7B-MoT ae.safetensors --local-dir models/BAGEL-
 
 The Hunyuan3D-2.1 shape VAE is loaded from Hugging Face (`tencent/Hunyuan3D-2.1`) at runtime.
 
+Download PointBERT. 
+```bash
+hf download RunsenXu/PointLLM_7B_v1.1_init point_bert_v1.1.pt --local-dir models
+```
+
 ## Checkpoint
 
+**4B image-to-3D** weights: **[JreamH/CGMLLM-4B-i2o](https://huggingface.co/JreamH/CGMLLM-4B-i2o)**.
+This checkpoint is a specialized training of our architecture for the image-to-3D object task on HY3D-Bench, built on [Qwen3-VL-4B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-4B-Instruct).
+
+```bash
+hf download JreamH/CGMLLM-4B-i2o ema.safetensors --local-dir models/CGMLLM-4B-i2o
+```
+
 **v0.1** weights: **[JreamH/CGMLLM](https://huggingface.co/JreamH/CGMLLM)**.
+This checkpoint is a multi-task training of our architecture, covering the various tasks described in the paper, built on [Qwen3-VL-2B-Instruct](https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct).
 Download the checkpoint so `--checkpoint` can find `ema.safetensors`:
 
 ```bash
 hf download JreamH/CGMLLM ema.safetensors --local-dir models/CGMLLM
 ```
 
+
+
 ## Inference
 
-Interactive menu:
+4B image-to-3D object: 
+
+```bash
+python inference.py \
+  --checkpoint models/CGMLLM-4B-i2o \
+  --llm_base_path Qwen/Qwen3-VL-4B-Instruct \
+  --use_qwen_vit --use_qwen_vl --qk_norm \
+  --mode i2obj --bg white --border_ratio 0.15 \
+  --image examples/chairo.png
+```
+
+v0.1 interactive menu:
 
 ```bash
 python inference.py \
   --llm_base_path Qwen/Qwen3-VL-2B-Instruct \
   --checkpoint models/CGMLLM \
-  --obj_vae_path tencent/Hunyuan3D-2.1 \
-  --obj_vae_len 4096 \
   --use_qwen_vit --use_qwen_vl --qk_norm \
-  --timestep_shift 3.0 --img_cfg 7.5 --txt_cfg 7.5
+  --timestep_shift 3.0 --img_cfg 7.5 --txt_cfg 7.5 \
+  --bg transparent --border_ratio 0.45
 ```
 
-Single-task examples:
+v0.1 single-task examples:
 
 ```bash
 # Image to 3D
 python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk_norm \
-  --mode i2obj --image examples/chairo.png
+  --mode i2obj --bg transparent --border_ratio 0.45 --image examples/chairo.png
 
 # Text to 3D
 python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk_norm \
@@ -119,7 +110,6 @@ python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk
 
 # 3D understanding with PointBERT
 python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk_norm \
-  --und_obj_vae_path /path/to/point_bert_v1.1.pt \
   --mode obj_und --obj examples/0ea33b6617174530b97d6b7a92c275fb_8192.npy \
   --prompt "What does this collection of points represent?"
 ```
@@ -141,6 +131,6 @@ If you find this work useful, please cite:
 
 ## Acknowledgements
 
-This inference code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE. Please follow their licenses when using those components.
+This inference code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE, and uses the [Point-BERT](https://github.com/lulutang0608/Point-BERT) encoder released with [PointLLM](https://github.com/RunsenXu/PointLLM). Please follow their licenses when using those components.
 
 We thank the open-source research community and the authors of the foundation models and 3D generation systems that make this research possible.

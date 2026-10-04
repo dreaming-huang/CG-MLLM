@@ -112,6 +112,78 @@ def preprocess_image(image_path, quality=85):
     return Image.open(io.BytesIO(buffer.getvalue()))
 
 
+# Hunyuan3D-2.1 ImageProcessorV2.__call__ passes border_ratio=0.15 into recenter.
+HUNYUAN_RECENTER_BORDER_RATIO = 0.15
+
+
+def composite_rgba_on_white(image):
+    """Composite a straight-alpha RGBA cutout onto opaque white."""
+    rgba = image.convert("RGBA")
+    background = Image.new("RGBA", rgba.size, (255, 255, 255, 255))
+    return Image.alpha_composite(background, rgba).convert("RGB")
+
+
+def recenter_rgba(image, border_ratio=HUNYUAN_RECENTER_BORDER_RATIO):
+    """Hunyuan3D-2.1 ImageProcessorV2.recenter, before the white composite.
+
+    Builds a square canvas of max(H, W), scales the foreground box to
+    (1 - border_ratio) of that canvas, and centers it. Transparent pixels stay
+    transparent. Hunyuan then composites this onto white; it does not JPEG-encode.
+    """
+    import cv2
+
+    rgba = np.asarray(image.convert("RGBA"))
+    if rgba.ndim != 3 or rgba.shape[-1] != 4:
+        raise ValueError(f"Expected an RGBA image, got shape {getattr(rgba, 'shape', None)}.")
+    mask = rgba[..., 3]
+    coords = np.nonzero(mask)
+    if coords[0].size == 0:
+        raise ValueError("Background removal left an empty foreground, so recenter has nothing to place.")
+    height, width, channels = rgba.shape
+    size = max(height, width)
+    x_min, x_max = int(coords[0].min()), int(coords[0].max())
+    y_min, y_max = int(coords[1].min()), int(coords[1].max())
+    box_h = x_max - x_min
+    box_w = y_max - y_min
+    if box_h <= 0 or box_w <= 0:
+        raise ValueError("Background removal left an empty foreground, so recenter has nothing to place.")
+    desired = int(size * (1 - border_ratio))
+    if desired <= 0:
+        raise ValueError(f"Image is too small to recenter (size={size}).")
+    scale = desired / max(box_h, box_w)
+    out_h = int(box_h * scale)
+    out_w = int(box_w * scale)
+    if out_h <= 0 or out_w <= 0:
+        raise ValueError("Background removal left an empty foreground, so recenter has nothing to place.")
+    resized = cv2.resize(
+        rgba[x_min:x_max, y_min:y_max],
+        (out_w, out_h),
+        interpolation=cv2.INTER_AREA,
+    )
+    canvas = np.zeros((size, size, channels), dtype=np.uint8)
+    x2_min = (size - out_h) // 2
+    y2_min = (size - out_w) // 2
+    canvas[x2_min:x2_min + out_h, y2_min:y2_min + out_w] = resized
+    return Image.fromarray(canvas, mode="RGBA")
+
+
+def get_background_remover(args=None):
+    """Lazy Hunyuan3D-2.1 BackgroundRemover (rembg new_session() -> u2net)."""
+    if args is not None and getattr(args, "_bg_remover", None) is not None:
+        return args._bg_remover
+    from hy3dshape.rembg import BackgroundRemover
+    remover = BackgroundRemover()
+    if args is not None:
+        args._bg_remover = remover
+    return remover
+
+
+def remove_background_hunyuan(image, args=None):
+    """Match Hunyuan3D-2.1 hy3dshape/rembg.py: rembg u2net, bgcolor=[255,255,255,0]."""
+    remover = get_background_remover(args)
+    return remover(image)
+
+
 def pc_norm(pc):
     xyz = pc[:, :3]
     other_feature = pc[:, 3:]
@@ -448,6 +520,55 @@ def image_understanding(inferencer, image_path=None, prompt=None):
     return text
 
 
+def _transform_rgb_channels(transform):
+    norm = getattr(transform, "normalize_transform", None)
+    mean = getattr(norm, "mean", None)
+    if mean is None:
+        return None
+    return len(tuple(mean))
+
+
+def model_image_from_rgba_cutout(cutout_rgba, inferencer):
+    """RGB view of a transparent cutout. Never composites onto white.
+
+    ImageTransform.Normalize is 3-channel, so alpha cannot be fed as a fourth
+    channel. PIL RGBA->RGB on this Pillow drops alpha instead of compositing, and rembg
+    stores white RGB under alpha 0. Composite onto black so the model sees
+    black where the cutout was transparent. Skip the JPEG round-trip.
+    """
+    if cutout_rgba.mode != "RGBA":
+        cutout_rgba = cutout_rgba.convert("RGBA")
+    channels = []
+    for name in ("vae_transform", "vit_transform"):
+        nchan = _transform_rgb_channels(getattr(inferencer, name, None))
+        if nchan is not None:
+            channels.append(f"{name}={nchan}")
+    rgba = np.asarray(cutout_rgba)
+    mask = rgba[:, :, 3] == 0
+    dropped = cutout_rgba.convert("RGB")
+    dropped_arr = np.asarray(dropped)
+    dropped_max = int(dropped_arr[mask].max()) if mask.any() else -1
+    # This Pillow RGBA->RGB drops alpha and keeps rembg's white RGB (bgcolor 255,255,255,0).
+    # Composite onto black so former transparent pixels are black, never white.
+    black = Image.new("RGBA", cutout_rgba.size, (0, 0, 0, 255))
+    rgb = Image.alpha_composite(black, cutout_rgba).convert("RGB")
+    rgb_arr = np.asarray(rgb)
+    mx = int(rgb_arr[mask].max()) if mask.any() else -1
+    print(
+        "[i2obj] Transparent background: NOT composited on white. "
+        f"PIL RGBA->RGB alone leaves max RGB {dropped_max} where alpha==0 "
+        "(alpha dropped, rembg RGB kept). "
+        "Model input is an explicit composite onto black; JPEG round-trip skipped. "
+        "normalize " + (", ".join(channels) or "unknown")
+        + f". max RGB where alpha==0 after black composite is {mx}."
+    )
+    if mx > 0:
+        raise RuntimeError(
+            f"Transparent pixels are not black after black composite (max={mx}). Refusing to continue."
+        )
+    return rgb
+
+
 def image_to_obj(inferencer, args, image_path=None):
     print("\n[Image to 3D object]")
     if image_path is None:
@@ -456,8 +577,41 @@ def image_to_obj(inferencer, args, image_path=None):
         print(f"Image not found: {image_path}")
         return None
 
-    image = preprocess_image(image_path)
-    output_path = os.path.join(args.output_dir, os.path.splitext(os.path.basename(image_path))[0] + "_to_obj.pth")
+    stem = os.path.splitext(os.path.basename(image_path))[0]
+    if getattr(args, "remove_bg", True):
+        bg_mode = getattr(args, "bg", None) or "white"
+        if bg_mode not in ("white", "transparent"):
+            raise ValueError(f"Unsupported --bg {bg_mode!r}; choose white or transparent.")
+        print(f"[i2obj] Removing background with rembg (Hunyuan3D-2.1 / u2net), bg={bg_mode}...")
+        cutout_rgba = remove_background_hunyuan(Image.open(image_path), args=args)
+        if cutout_rgba.mode != "RGBA":
+            cutout_rgba = cutout_rgba.convert("RGBA")
+        border_ratio = float(getattr(args, "border_ratio", HUNYUAN_RECENTER_BORDER_RATIO))
+        if not 0.0 <= border_ratio < 1.0:
+            raise ValueError(f"--border_ratio must be in [0, 1), got {border_ratio}.")
+        cutout_rgba = recenter_rgba(cutout_rgba, border_ratio=border_ratio)
+        print(
+            "[i2obj] Recentered foreground on a square canvas "
+            f"(border_ratio={border_ratio}, object fills {1 - border_ratio:.0%} of the long side)."
+        )
+        os.makedirs(args.output_dir, exist_ok=True)
+        cutout_path = os.path.join(args.output_dir, f"{stem}_rmbg.png")
+        if bg_mode == "transparent":
+            cutout_rgba.save(cutout_path, format="PNG")
+            print(f"[i2obj] Saved transparent RGBA cutout to {cutout_path}")
+            image = model_image_from_rgba_cutout(cutout_rgba, inferencer)
+        else:
+            cutout_rgb = composite_rgba_on_white(cutout_rgba)
+            cutout_rgb.save(cutout_path)
+            print(f"[i2obj] Saved white-background cutout to {cutout_path}")
+            image = cutout_rgb
+    else:
+        if (getattr(args, "bg", "white") or "white") != "white":
+            print("[i2obj] --bg is ignored because background removal is off (--no_remove_bg).")
+        print("[i2obj] Skipping background removal (--no_remove_bg).")
+        image = preprocess_image(image_path)
+    print(f"[i2obj] Model input image mode={image.mode} size={image.size}")
+    output_path = os.path.join(args.output_dir, stem + "_to_obj.pth")
     output = inferencer(
         image=image,
         vae_obj_output=True,
@@ -605,8 +759,10 @@ def parse_args():
     parser.add_argument("--image_vae_path", type=str, default="models/BAGEL-7B-MoT/ae.safetensors")
     parser.add_argument("--vit_config", type=str, default="models/BAGEL-7B-MoT/vit_config.json")
     parser.add_argument("--obj_vae_path", type=str, default="tencent/Hunyuan3D-2.1")
-    parser.add_argument("--und_obj_vae_path", type=str, default="tencent/Hunyuan3D-2.1",
-                        help="Understanding encoder: Hunyuan3D repo id, uni3d_g.pt, or point_bert_v1.1.pt")
+    parser.add_argument("--und_obj_vae_path", type=str, default="models/point_bert_v1.1.pt",
+                        help="3D understanding encoder. Default is PointBERT at models/point_bert_v1.1.pt. "
+                             "Also accepts a Hunyuan3D repo id or uni3d_g.pt. "
+                             "PointBERT and Uni3D are selected from the filename.")
     parser.add_argument("--obj_vae_len", type=int, default=4096)
     parser.add_argument("--txt_cfg", type=float, default=4.0)
     parser.add_argument("--img_cfg", type=float, default=7.5)
@@ -636,6 +792,39 @@ def parse_args():
     parser.add_argument("--image", type=str, default=None, help="Input image for i2obj / img_und.")
     parser.add_argument("--prompt", type=str, default=None, help="Text prompt or question.")
     parser.add_argument("--obj", type=str, default=None, help="Mesh or point-cloud file for obj_und.")
+    parser.add_argument(
+        "--remove_bg",
+        dest="remove_bg",
+        action="store_true",
+        default=True,
+        help="Remove image background with rembg u2net (Hunyuan3D-2.1 style) before i2obj. Default: on.",
+    )
+    parser.add_argument(
+        "--no_remove_bg",
+        dest="remove_bg",
+        action="store_false",
+        help="Disable Hunyuan-style rembg foreground removal for i2obj.",
+    )
+    parser.add_argument(
+        "--border_ratio",
+        type=float,
+        default=HUNYUAN_RECENTER_BORDER_RATIO,
+        help=(
+            "Empty margin after rembg, as a fraction of the square canvas. "
+        ),
+    )
+    parser.add_argument(
+        "--bg",
+        type=str,
+        default="white",
+        choices=["white", "transparent"],
+        help=(
+            "Background after rembg and Hunyuan recenter. white (default): composite the "
+            "cutout onto white, with no JPEG round-trip. "
+            "transparent: keep the RGBA cutout and save it as PNG. "
+            "Ignored with --no_remove_bg. The 4B model should stay on white."
+        ),
+    )
     return parser.parse_args()
 
 
