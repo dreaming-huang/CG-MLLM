@@ -1,14 +1,42 @@
-# CG-MLLM
+<p align="center">
+  <h1 align="center"><strong>CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models</strong></h1>
+</p>
 
+<p align="center">
+    Junming Huang<sup>1,2</sup>,
+    Chi Wang<sup>1</sup>,
+    Letian Li<sup>1,2</sup>,
+    Guangkai Xu<sup>1</sup>,
+    Donglin Huang<sup>1</sup>,
+    Hao Chen<sup>1</sup>,
+    Qiang Dai<sup>2</sup>,
+    Weiwei Xu<sup>1</sup>
+    <br>
+    <sup>1</sup>Zhejiang University,
+    <sup>2</sup>LIGHTSPEED
+</p>
 
+<h3 align="center">ICML 2026</h3>
 
-# Captioning and Generating 3D content via Multi-modal Large Language Models
+<div align="center">
 
-> Junming Huang, Chi Wang, Letian Li, Guangkai Xu, Donglin Huang, Hao Chen, Qiang Dai, Weiwei Xu
->
-> We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency.
+<a href="https://arxiv.org/abs/2601.21798"><img src="https://img.shields.io/badge/arXiv-2601.21798-b31b1b.svg" alt="arXiv"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://cv.jream.top/CG-MLLM-page/"><img src="https://img.shields.io/badge/Project-Page-Green" alt="Project Page"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://huggingface.co/JreamH/CGMLLM-4B-i2o"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Weights-4B--i2o-orange" alt="4B weights"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://huggingface.co/JreamH/CGMLLM"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Weights-v0.1-orange" alt="v0.1 weights"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://github.com/dreaming-huang/CG-MLLM"><img src="https://img.shields.io/badge/Code-GitHub-black?logo=github" alt="Code"></a>
 
+</div>
 
+<p align="center">
+  <video src="assets/staircase_40_camera_1080p_hq.mp4" width="850" controls autoplay muted loop playsinline></video>
+</p>
+
+<p align="center">
+  <img src="assets/overview.png" alt="CG-MLLM generation and understanding examples" width="850"/>
+</p>
+
+We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency.
 
 This repository contains the **inference** code.
 
@@ -23,6 +51,10 @@ This repository contains the **inference** code.
 ## Overview
 
 Unlike prior 3D MLLM methods that often generate low-resolution meshes, textualized mesh tokens, or coarse structural proxies, CG-MLLM integrates a pretrained vision-language backbone with a specialized 3D VAE latent space. This design allows the model to perform end-to-end 3D generation within the MLLM paradigm while preserving fine-grained geometry.
+
+<p align="center">
+  <img src="assets/pipeline.png" alt="CG-MLLM pipeline" width="944"/>
+</p>
 
 
 
