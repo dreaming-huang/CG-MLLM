@@ -28,9 +28,7 @@
 
 </div>
 
-<p align="center">
-  <video src="assets/staircase_40_camera_1080p_hq.mp4" width="850" controls autoplay muted loop playsinline></video>
-</p>
+https://github.com/user-attachments/assets/237c32d9-d9b8-40ea-addc-c354a276d20a
 
 <p align="center">
   <img src="assets/overview.png" alt="CG-MLLM generation and understanding examples" width="850"/>
