@@ -20,13 +20,17 @@
 
 <div align="center">
 
-<a href="https://arxiv.org/abs/2601.21798"><img src="https://img.shields.io/badge/arXiv-2601.21798-b31b1b.svg" alt="arXiv"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://cv.jream.top/CG-MLLM-page/"><img src="https://img.shields.io/badge/Project-Page-Green" alt="Project Page"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://arxiv.org/abs/2601.21798"><img src="https://img.shields.io/badge/arXiv-2601.21798-b31b1b.svg" alt="arXiv"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://huggingface.co/JreamH/CGMLLM-4B-i2o"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Weights-4B--i2o-orange" alt="4B weights"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://huggingface.co/JreamH/CGMLLM"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Weights-v0.1-orange" alt="v0.1 weights"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://github.com/dreaming-huang/CG-MLLM"><img src="https://img.shields.io/badge/Code-GitHub-black?logo=github" alt="Code"></a>
 
 </div>
+
+<p align="center">
+  <a href="https://cv.jream.top/CG-MLLM-page/">Project Page</a> · <a href="https://arxiv.org/abs/2601.21798">arXiv</a> · <a href="https://github.com/dreaming-huang/CG-MLLM">Code</a>
+</p>
 
 https://github.com/user-attachments/assets/237c32d9-d9b8-40ea-addc-c354a276d20a
 
@@ -34,7 +38,7 @@ https://github.com/user-attachments/assets/237c32d9-d9b8-40ea-addc-c354a276d20a
   <img src="assets/overview.png" alt="CG-MLLM generation and understanding examples" width="850"/>
 </p>
 
-We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency.
+We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency. Project page: [https://cv.jream.top/CG-MLLM-page/](https://cv.jream.top/CG-MLLM-page/).
 
 This repository contains the **inference** code.
 
