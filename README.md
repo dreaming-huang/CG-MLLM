@@ -24,6 +24,8 @@
 <a href="https://arxiv.org/abs/2601.21798"><img src="https://img.shields.io/badge/arXiv-2601.21798-b31b1b.svg" alt="arXiv"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://huggingface.co/JreamH/CGMLLM-4B-i2o"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Weights-4B--i2o-orange" alt="4B weights"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://huggingface.co/JreamH/CGMLLM"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Weights-v0.1-orange" alt="v0.1 weights"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_github"><img src="https://img.shields.io/badge/ModelScope%20Data-t500k--github-624aff" alt="TRELLIS-500K github data"></a> &nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_sketchfab"><img src="https://img.shields.io/badge/ModelScope%20Data-t500k--sketchfab-624aff" alt="TRELLIS-500K sketchfab data"></a> &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="https://github.com/dreaming-huang/CG-MLLM"><img src="https://img.shields.io/badge/Code-GitHub-black?logo=github" alt="Code"></a>
 
 </div>
@@ -44,6 +46,7 @@ This repository contains the **inference** and **training** code.
 
 ## News
 
+- **2026-10-09**: **Training code** and **3D training data** are released. We processed the [TRELLIS-500K](https://github.com/microsoft/TRELLIS) objects following the [Hunyuan3D-2.1](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) data pipeline, and the processed data is openly available on ModelScope: [CGMLLM_t500k_github](https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_github) and [CGMLLM_t500k_sketchfab](https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_sketchfab). See [Training](#training).
 - **2026-10-04**: **4B image-to-3D** checkpoint is released. It is a specialized training of our architecture for the image-to-3D object task on HY3D-Bench. Weights: [JreamH/CGMLLM-4B-i2o](https://huggingface.co/JreamH/CGMLLM-4B-i2o).
 - **2026-09-07**: Inference code and **v0.1** checkpoint are released. Weights: [JreamH/CGMLLM](https://huggingface.co/JreamH/CGMLLM).
 - **2026-05-07**: 🎉 Our paper **CG-MLLM: Captioning and Generating 3D content via Multi-modal Large Language Models** has been accepted to ICML 2026. See you in Seoul!
@@ -213,6 +216,6 @@ If you find this work useful, please cite:
 
 ## Acknowledgements
 
-This code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE, and uses the [Point-BERT](https://github.com/lulutang0608/Point-BERT) encoder released with [PointLLM](https://github.com/RunsenXu/PointLLM). Please follow their licenses when using those components. Training uses [LLaVA-ReCap-558K](https://huggingface.co/datasets/lmms-lab/LLaVA-ReCap-558K) and [LLaVA-OneVision-Data](https://huggingface.co/datasets/lmms-lab/LLaVA-OneVision-Data) from [LLaVA-OneVision](https://github.com/LLaVA-VL/LLaVA-NeXT), the PointLLM data, [HY3D-Bench](https://huggingface.co/datasets/tencent/HY3D-Bench), and 3D assets from [Objaverse-XL](https://github.com/allenai/objaverse-xl) rendered and filtered following [TRELLIS](https://github.com/microsoft/TRELLIS).
+This code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE, and uses the [Point-BERT](https://github.com/lulutang0608/Point-BERT) encoder released with [PointLLM](https://github.com/RunsenXu/PointLLM). Please follow their licenses when using those components. Training uses [LLaVA-ReCap-558K](https://huggingface.co/datasets/lmms-lab/LLaVA-ReCap-558K) and [LLaVA-OneVision-Data](https://huggingface.co/datasets/lmms-lab/LLaVA-OneVision-Data) from [LLaVA-OneVision](https://github.com/LLaVA-VL/LLaVA-NeXT), the PointLLM data, [HY3D-Bench](https://huggingface.co/datasets/tencent/HY3D-Bench), and the [TRELLIS-500K](https://github.com/microsoft/TRELLIS) objects processed following the Hunyuan3D-2.1 data pipeline.
 
 We thank the open-source research community and the authors of the foundation models and 3D generation systems that make this research possible.
