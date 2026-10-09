@@ -174,6 +174,15 @@ modelscope download --dataset jreamHuang/CGMLLM_t500k_github --local_dir dataset
 modelscope download --dataset jreamHuang/CGMLLM_t500k_sketchfab --local_dir datasets/CGMLLM_t500k_sketchfab
 ```
 
+The Sketchfab split ships without captions. Add the TRELLIS-500K captions so that it can also be used for text-to-3D. Without this step, the split is used for image-to-3D only.
+
+```bash
+hf download JeffreyXiang/TRELLIS-500K ObjaverseXL_sketchfab.csv --repo-type dataset --local-dir datasets/TRELLIS-500K
+python scripts/add_sketchfab_captions.py \
+  --parquet_dir datasets/CGMLLM_t500k_sketchfab \
+  --csv_path datasets/TRELLIS-500K/ObjaverseXL_sketchfab.csv
+```
+
 **3D understanding.** Use the point clouds and brief descriptions from [PointLLM](https://huggingface.co/datasets/RunsenXu/PointLLM). 
 
 Set the dataset paths in `data/dataset_info.py`. The data mix is defined in a YAML file under `data/configs/`, where `num_used_data` is the number of jsonl lines or parquet files used from each dataset.
