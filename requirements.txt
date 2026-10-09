@@ -1,4 +1,4 @@
-# CG-MLLM inference
+# CG-MLLM inference and training
 # Merged from BAGEL/requirements.txt + Hunyuan3D pieces used by hy3dshape.
 # transformers 4.57.2 can load Qwen3-VL and still accepts torch 2.5.1.
 # huggingface_hub 0.36.0 provides the `hf` CLI and stays inside transformers' <1.0 cap.
@@ -41,7 +41,11 @@ onnxruntime==1.16.3
 # Linux CUDA compile helper used by torch
 triton ; sys_platform != 'win32'
 
-# Install separately if the GPU supports it:
+# Training
+pyarrow
+wandb
+
+# Install separately if the GPU supports it (required for training):
 # pip install flash_attn==2.5.8 --no-build-isolation
 
 # Not included from Hunyuan (texture / demo / training only):
@@ -49,5 +53,5 @@ triton ; sys_platform != 'win32'
 # open3d, cupy-cuda12x, diffusers, pytorch-lightning,
 # deepspeed, gradio, fastapi, uvicorn, pandas, torchmetrics, torchdiffeq
 #
-# Not included from BAGEL (train / eval only):
-# decord, pyarrow, wandb, bitsandbytes, xlsxwriter, gradio
+# Not included from BAGEL (video / eval only):
+# decord, bitsandbytes, xlsxwriter, gradio

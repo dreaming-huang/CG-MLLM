@@ -108,6 +108,14 @@ def pil_img2rgb(image):
     return image
 
 
+def make_shape_vae_surface(points):
+    """(N, >=6) xyz + normal -> (N, 7) xyz + unit normal + sharp-edge label, the Hunyuan3D-2.1 encoder input."""
+    points = torch.as_tensor(np.asarray(points)[:, :6], dtype=torch.float32)
+    normal = torch.nn.functional.normalize(points[:, 3:6], p=2, dim=1)
+    sharpedge_label = torch.zeros(points.shape[0], 1)
+    return torch.cat([points[:, :3], normal, sharpedge_label], dim=-1)
+
+
 def add_special_tokens(tokenizer):
     all_special_tokens = []
     for k, v in tokenizer.special_tokens_map.items():

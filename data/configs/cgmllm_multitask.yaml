@@ -1,0 +1,47 @@
+# Multi-task recipe of the v0.1 checkpoint: image understanding + image/text-to-3D + 3D understanding.
+# Dataset paths live in data/dataset_info.py. `image_stride` / `merge_size` are filled from the ViT config,
+# and `latent_length` of 3D generation groups from --obj_vae_len.
+# num_used_data: jsonl lines for vlm_sft / pointllm_pretrain, parquet files for i2obj_pretrain.
+
+vlm_sft:
+  dataset_names:
+  - llava_recap_558k
+  - llava_onevision
+  image_transform_args:
+    max_image_size: 980
+    min_image_size: 378
+    max_pixels: 2_007_040
+  is_mandatory: true
+  shuffle_lines: true
+  shuffle_seed: 0
+  num_used_data:
+  - 558128
+  - 2865855
+  weight: 1
+
+i2obj_pretrain:
+  dataset_names:
+  - trellis_sketchfab
+  - trellis_github
+  image_transform_args:
+    max_image_size: 518
+    min_image_size: 224
+  is_mandatory: true
+  num_used_data:
+  - 1624
+  - 2729
+  weight: 1
+  cond_mode: mixed  # text-only / image-only by the probabilities below
+  text_only_prob: 0.5
+  image_only_prob: 0.5
+  text_and_image_prob: 0.0
+
+pointllm_pretrain:
+  dataset_names:
+  - pointllm_brief
+  is_mandatory: true
+  shuffle_lines: true
+  shuffle_seed: 0
+  num_used_data:
+  - 658577
+  weight: 1

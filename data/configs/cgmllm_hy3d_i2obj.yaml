@@ -1,0 +1,29 @@
+# Image-to-3D recipe of the 4B i2o checkpoint: HY3D-Bench i2obj, with image understanding to keep the VLM ability.
+# num_used_data: jsonl lines for vlm_sft, chunks for hy3d_i2obj_pretrain.
+
+vlm_sft:
+  dataset_names:
+  - llava_recap_558k
+  - llava_onevision
+  image_transform_args:
+    max_image_size: 980
+    min_image_size: 378
+    max_pixels: 2_007_040
+  is_mandatory: true
+  shuffle_lines: true
+  shuffle_seed: 0
+  num_used_data:
+  - 558128
+  - 2865855
+  weight: 1
+
+hy3d_i2obj_pretrain:
+  dataset_names:
+  - hy3d_full_train
+  image_transform_args:
+    max_image_size: 518
+    min_image_size: 224
+  is_mandatory: true
+  num_used_data:
+  - 2519
+  weight: 9

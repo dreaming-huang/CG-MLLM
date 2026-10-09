@@ -40,7 +40,7 @@ https://github.com/user-attachments/assets/237c32d9-d9b8-40ea-addc-c354a276d20a
 
 We present **CG-MLLM**, a unified multimodal large language model for 3D captioning and high-fidelity 3D content generation. CG-MLLM brings language, image, and 3D spatial content into a single framework, enabling multimodal understanding and detailed 3D object generation with strong spatial consistency. Project page: [https://cv.jream.top/CG-MLLM-page/](https://cv.jream.top/CG-MLLM-page/).
 
-This repository contains the **inference** code.
+This repository contains the **inference** and **training** code.
 
 ## News
 
@@ -150,6 +150,54 @@ python inference.py --checkpoint models/CGMLLM --use_qwen_vit --use_qwen_vl --qk
 
 Generated meshes are written to `--output_dir` (default: `<checkpoint>/output_images`).
 
+## Training
+
+Each decoder layer has two experts that share attention. The **TokenAR** expert processes text and image (ViT) tokens. The **BlockAR** expert processes 3D tokens: Hunyuan3D-2.1 ShapeVAE latents for generation, trained with flow matching, and PointBERT tokens for 3D understanding. At the start of training, the BlockAR expert is copied from the TokenAR expert of the Qwen-VL backbone.
+
+### Data
+
+**Image understanding.** Download [LLaVA-ReCap-558K](https://huggingface.co/datasets/lmms-lab/LLaVA-ReCap-558K) and [LLaVA-OneVision-Data](https://huggingface.co/datasets/lmms-lab/LLaVA-OneVision-Data), then process them as in [BAGEL](https://github.com/ByteDance-Seed/Bagel/blob/main/TRAIN.md): an `images/` folder plus a LLaVA-style jsonl for each dataset.
+
+```bash
+hf download lmms-lab/LLaVA-ReCap-558K --repo-type dataset --local-dir datasets/LLaVA-ReCap-558K
+hf download lmms-lab/LLaVA-OneVision-Data --repo-type dataset --local-dir datasets/LLaVA-OneVision-Data
+```
+
+**3D generation.** Our image / text-to-3D parquet data is on ModelScope: [CGMLLM_t500k_github](https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_github) and [CGMLLM_t500k_sketchfab](https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_sketchfab).
+
+```bash
+pip install modelscope
+modelscope download --dataset jreamHuang/CGMLLM_t500k_github --local_dir datasets/CGMLLM_t500k_github
+modelscope download --dataset jreamHuang/CGMLLM_t500k_sketchfab --local_dir datasets/CGMLLM_t500k_sketchfab
+```
+
+**3D understanding.** Use the point clouds and brief descriptions from [PointLLM](https://huggingface.co/datasets/RunsenXu/PointLLM). 
+
+Set the dataset paths in `data/dataset_info.py`. The data mix is defined in a YAML file under `data/configs/`, where `num_used_data` is the number of jsonl lines or parquet files used from each dataset.
+
+| Group | Format |
+| --- | --- |
+| `vlm_sft` | LLaVA-style jsonl: `{"image": str \| [str], "conversations": [{"from": "human" \| "gpt", "value": ...}]}`, with `<image>` placeholders |
+| `pointllm_pretrain` | PointLLM jsonl: `{"object_id": str, "conversations": [...]}`, plus `<data_dir>/<object_id>_8192.npy` (xyz + rgb) and `<point>` placeholders |
+| `i2obj_pretrain` / `t2obj_pretrain` | parquet with columns `surface` (npz bytes whose `random_surface` is an (N, 6) array of xyz + normal), `image_list` (list of image bytes) and `captions` (JSON list) |
+| `hy3d_i2obj_pretrain` | [HY3D-Bench](https://huggingface.co/datasets/tencent/HY3D-Bench) layout: `images/chunk_*/<uid>_vc_render.npz` and `sample_points/chunk_*/*_surface_*.tar` |
+
+You also need the PointBERT weights at `models/point_bert_v1.1.pt`, the same file used for inference.
+
+### Launch
+
+Training runs in four stages, and the shape-latent length grows from 512 to 1024, 2048 and finally 4096. Each stage starts from the latest checkpoint of the previous one.
+
+```bash
+# v0.1 recipe: Qwen3-VL-2B, image / 3D understanding + image / text-to-3D
+for s in 1 2 3 4; do RECIPE=multitask STAGE=$s bash scripts/train.sh; done
+
+# 4B image-to-3D recipe: Qwen3-VL-4B, HY3D-Bench
+for s in 1 2 3 4; do RECIPE=hy3d_i2obj STAGE=$s bash scripts/train.sh; done
+```
+
+For multi-node training, run the same command on every node with `NNODES`, `NODE_RANK`, `MASTER_ADDR` and `MASTER_PORT` set. Checkpoints are written to `results/<exp>/checkpoints/<step>/`. Interrupted runs resume automatically. A checkpoint can be passed directly to `inference.py --checkpoint`, which loads `ema.safetensors`.
+
 ## Citation
 
 If you find this work useful, please cite:
@@ -165,6 +213,6 @@ If you find this work useful, please cite:
 
 ## Acknowledgements
 
-This inference code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE, and uses the [Point-BERT](https://github.com/lulutang0608/Point-BERT) encoder released with [PointLLM](https://github.com/RunsenXu/PointLLM). Please follow their licenses when using those components.
+This code is built on [BAGEL](https://github.com/ByteDance-Seed/Bagel) and the [Hunyuan3D](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) shape VAE, and uses the [Point-BERT](https://github.com/lulutang0608/Point-BERT) encoder released with [PointLLM](https://github.com/RunsenXu/PointLLM). Please follow their licenses when using those components. Training uses [LLaVA-ReCap-558K](https://huggingface.co/datasets/lmms-lab/LLaVA-ReCap-558K) and [LLaVA-OneVision-Data](https://huggingface.co/datasets/lmms-lab/LLaVA-OneVision-Data) from [LLaVA-OneVision](https://github.com/LLaVA-VL/LLaVA-NeXT), the PointLLM data, [HY3D-Bench](https://huggingface.co/datasets/tencent/HY3D-Bench), and 3D assets from [Objaverse-XL](https://github.com/allenai/objaverse-xl) rendered and filtered following [TRELLIS](https://github.com/microsoft/TRELLIS).
 
 We thank the open-source research community and the authors of the foundation models and 3D generation systems that make this research possible.
