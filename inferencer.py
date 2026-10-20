@@ -16,12 +16,15 @@ GEN_THINK_SYSTEM_PROMPT = "You should first think about the planning process in 
 
 
 class InterleaveInferencer:
-    def __init__(self, model, vae_model, tokenizer, vae_transform, vit_transform, new_token_ids):
+    def __init__(self, model, vae_model, tokenizer, vae_transform, vit_transform, new_token_ids, vit_gen_transform=None):
         self.model = model
         self.vae_model = vae_model
         self.tokenizer = tokenizer
         self.vae_transform = vae_transform
+        # vit_transform: image understanding (980 max, as in vlm_sft training).
+        # vit_gen_transform: image-to-3D conditioning (518 max, as in i2obj training).
         self.vit_transform = vit_transform
+        self.vit_gen_transform = vit_gen_transform if vit_gen_transform is not None else vit_transform
         self.new_token_ids = new_token_ids
 
     def init_gen_context(self):
@@ -50,8 +53,10 @@ class InterleaveInferencer:
         return gen_context
 
     @torch.no_grad()
-    def update_context_image(self, image, gen_context, vae=False, vit=True):
+    def update_context_image(self, image, gen_context, vae=False, vit=True, vit_transform=None):
         assert vae or vit
+        if vit_transform is None:
+            vit_transform = self.vit_transform
         past_key_values = gen_context["past_key_values"]
         kv_lens = gen_context["kv_lens"]
         ropes = gen_context["ropes"]
@@ -71,7 +76,7 @@ class InterleaveInferencer:
                 curr_kvlens=kv_lens,
                 curr_rope=ropes,
                 images=[image],
-                transforms=self.vit_transform,
+                transforms=vit_transform,
                 new_token_ids=self.new_token_ids,
             )
             past_key_values = self.model.forward_cache_update_vit(past_key_values, **generation_input)
@@ -209,6 +214,7 @@ class InterleaveInferencer:
         gen_context = self.init_gen_context()
         cfg_text_context = deepcopy(gen_context)
         cfg_img_context = deepcopy(gen_context)
+        vit_transform = self.vit_gen_transform if vae_obj_output else self.vit_transform
 
         with torch.autocast(device_type="cuda", enabled=True, dtype=torch.bfloat16):
             if think:
@@ -222,8 +228,10 @@ class InterleaveInferencer:
                     gen_context = self.update_context_text(input_term, gen_context)
                     cfg_img_context = self.update_context_text(input_term, cfg_img_context)
                 elif isinstance(input_term, Image.Image):
-                    input_term = self.vit_transform.resize_transform(pil_img2rgb(input_term))
-                    gen_context = self.update_context_image(input_term, gen_context, vae=False, vit=True)
+                    input_term = vit_transform.resize_transform(pil_img2rgb(input_term))
+                    gen_context = self.update_context_image(
+                        input_term, gen_context, vae=False, vit=True, vit_transform=vit_transform
+                    )
                     cfg_text_context = deepcopy(gen_context)
                 elif isinstance(input_term, torch.Tensor):
                     gen_context = self.update_context_obj(input_term, gen_context)

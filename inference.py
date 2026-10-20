@@ -396,7 +396,11 @@ def setup_model(args):
         model.language_model.config.vocab_size = len(tokenizer)
 
     vae_transform = ImageTransform(1024, 512, 16)
-    vit_transform = ImageTransform(518, 224, getattr(vit_config, "patch_size", 14), 2 if args.use_qwen_vit else 1)
+    vit_patch = getattr(vit_config, "patch_size", 14)
+    vit_merge = 2 if args.use_qwen_vit else 1
+    # Match training (data/configs/cgmllm_multitask.yaml): vlm_sft uses 980/378, i2obj uses 518/224.
+    vit_transform = ImageTransform(980, 378, vit_patch, vit_merge, max_pixels=2_007_040)
+    vit_gen_transform = ImageTransform(518, 224, vit_patch, vit_merge)
 
     if args.mot:
         no_split_classes = ["CGMLLM", "Qwen2MoTDecoderLayer" if not args.use_qwen_vl else "Qwen2VLMoTDecoderLayer"]
@@ -448,6 +452,7 @@ def setup_model(args):
         tokenizer=tokenizer,
         vae_transform=vae_transform,
         vit_transform=vit_transform,
+        vit_gen_transform=vit_gen_transform,
         new_token_ids=new_token_ids,
     )
     return inferencer
@@ -539,7 +544,7 @@ def model_image_from_rgba_cutout(cutout_rgba, inferencer):
     if cutout_rgba.mode != "RGBA":
         cutout_rgba = cutout_rgba.convert("RGBA")
     channels = []
-    for name in ("vae_transform", "vit_transform"):
+    for name in ("vae_transform", "vit_gen_transform"):
         nchan = _transform_rgb_channels(getattr(inferencer, name, None))
         if nchan is not None:
             channels.append(f"{name}={nchan}")
