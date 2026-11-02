@@ -46,6 +46,7 @@ This repository contains the **inference** and **training** code.
 
 ## News
 
+- **2026-11-02**: 🚀 **CG-MLLM++** is complete and will be released soon — generation and understanding are both stronger. Before the full drop, you can already try our **4B image-to-3D** to experience 4B-scale 3D generation: [JreamH/CGMLLM-4B-i2o](https://huggingface.co/JreamH/CGMLLM-4B-i2o).
 - **2026-10-09**: **Training code** and **3D training data** are released. We processed the [TRELLIS-500K](https://github.com/microsoft/TRELLIS) objects following the [Hunyuan3D-2.1](https://github.com/Tencent-Hunyuan/Hunyuan3D-2.1) data pipeline, and the processed data is openly available on ModelScope: [CGMLLM_t500k_github](https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_github) and [CGMLLM_t500k_sketchfab](https://www.modelscope.cn/datasets/jreamHuang/CGMLLM_t500k_sketchfab). See [Training](#training).
 - **2026-10-04**: **4B image-to-3D** checkpoint is released. It is a specialized training of our architecture for the image-to-3D object task on HY3D-Bench. Weights: [JreamH/CGMLLM-4B-i2o](https://huggingface.co/JreamH/CGMLLM-4B-i2o).
 - **2026-09-07**: Inference code and **v0.1** checkpoint are released. Weights: [JreamH/CGMLLM](https://huggingface.co/JreamH/CGMLLM).
