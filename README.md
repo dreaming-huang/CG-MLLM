@@ -116,7 +116,7 @@ python inference.py \
   --checkpoint models/CGMLLM-4B-i2o \
   --llm_base_path Qwen/Qwen3-VL-4B-Instruct \
   --use_qwen_vit --use_qwen_vl --qk_norm \
-  --mode i2obj --bg white --border_ratio 0.15 --img_cfg 5 \
+  --mode i2obj --bg white --border_ratio 0.15 --img_cfg 7.5 \
   --image examples/chairo.png
 ```
 
