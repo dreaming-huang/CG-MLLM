@@ -24,7 +24,7 @@ Junming Huang, Chi Wang, Letian Li, Guangkai Xu, Donglin Huang, Hao Chen, Qiang 
 This repo hosts the **v0.1** inference weights (`ema.safetensors`). Use them with the [official inference code](https://github.com/dreaming-huang/CG-MLLM).
 
 - Paper: [arXiv:2601.21798](https://arxiv.org/abs/2601.21798)
-- Project page: [cv.jream.top/CG-MLLM-page](https://cv.jream.top/CG-MLLM-page/)
+- Project page: [https://cg-mllm.jream.top/](https://cg-mllm.jream.top/)
 - Code: [github.com/dreaming-huang/CG-MLLM](https://github.com/dreaming-huang/CG-MLLM)
 
 ## Model description
